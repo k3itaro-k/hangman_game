@@ -5,19 +5,7 @@ Python 3.7.
 Created by k3itaro-k
 
 
-PUNTOS FALTANTES
-
-1. Función hangman que dibuje al ahorcado, debe estar presente en todas las pantallas hasta en la de derrota
-    con todo y el nombre en grande.(dejar al ultimo)
-3. Limpiar las palabras de acentos, solo para la detección, para la impresión debe estar bien escrita. implementar en select a word?
-    que retorne una lista de palabras una limpia y normal?
-5. Revisar las condicionaes si se adivino la palabra o no
-6. Refactorizar en una función la comparación de las letras en las palabras.
-8. Pasar el flujo de ejecucion a main()  IN PROCESS
-7. Tratar de usar comprehension
-8. Poner mensaje de perdedor.
-9. Hacer una comprobacion para que el usuario sea advertido cuando ingrese letras que ya ingreso antes.
-10. Analizar la dinamica de los niveles de juego ¿dejar estaticos el numero de intentos en cada nivel de dificultad?
+in process..
 
 '''
 import os
@@ -26,7 +14,7 @@ from typing import List
 
 from art import text2art as t2a
 
-def clear_screen():
+def clear_screen() -> None:
     if os.name =='posix':
         os.system('clear')
     else:
@@ -40,11 +28,22 @@ def ascii_art(phrase: str, font=None) -> str:
     print(art)
 
 def select_word() -> str:
+
     with open('data.txt', 'r', encoding='utf-8') as f:
         words = f.read().split('\n')
 
     word = words[random.randint(0, len(words) - 1)]
+
     return word
+
+def clean_word(word: str):
+    word = word.lower()
+    replacements = [['á','a'], ['é','e'],['í','i'],['ó','o'],['ú','u']]
+
+    for current, new in replacements:
+        word = word.replace(current,new)
+
+    return word 
 
 def ask_for_a_letter() -> str:
     try:
@@ -56,8 +55,8 @@ def ask_for_a_letter() -> str:
     except Exception as e:
         print(e)
 
-def print_word(word_list):
-    return ''.join(word_li)
+def print_word(word_list) -> str:
+    return ' '.join(word_list)
 
 def hangman_ascii(n: int) -> str:
     pass
@@ -101,7 +100,7 @@ def main():
     level = game_level()
     word = select_word()
     list_of_attempts = number_of_attempts(level, word)
-    secret_word = ['_' for letter in range(len(word))]
+    secret_word = ['_' for letter in word]
     # game screen
     while list_of_attempts[0] > 0:
         clear_screen()
@@ -112,9 +111,7 @@ def main():
         print('You have {} attempts and your word have {} letters left to guess.'.format(list_of_attempts[0],list_of_attempts[1]))
         print('\n' * 3)
         word_li = [x for x in word]
-        print(word_li)
-        print('\n' * 3)
-        print(secret_word)
+        print(print_word(secret_word))
         print('\n' * 3)
         letter = ask_for_a_letter()
 
@@ -123,8 +120,8 @@ def main():
 
             for x in word_li:
 
-                if letter == x:
-                    secret_word[idx] = letter
+                if letter == clean_word(x):
+                    secret_word[idx] = x
                     list_of_attempts[1] -= 1
                     print(list_of_attempts[1])
 
